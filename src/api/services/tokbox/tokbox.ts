@@ -12,6 +12,10 @@ class OpenTokHandler {
         this.opentok = new OpenTok(apiKey, apiSecret);
     }
 
+    private logRooms(){
+      console.log(this.rooms);
+    }
+
     private generatePassword(name: string) {
         return cryptoRandomString(6);
     }
@@ -35,7 +39,7 @@ class OpenTokHandler {
           if (session) {
             const room: Room = {id : session.sessionId, password : this.generatePassword(roomName)};
             this.addRoom(roomName, room);
-            console.log(this.rooms);
+            this.logRooms();
             const token: string = this.opentok.generateToken(session.sessionId);
             callbackFunction(this.apiKey, session.sessionId, token, room.password);
             return;
@@ -52,7 +56,7 @@ class OpenTokHandler {
 
     async getSession(options: sessionOptions) {
         const { roomName, callbackFunction, errorFunction } = options;
-        console.log(this.rooms);
+        this.logRooms();
     
         if (this.rooms[roomName]) {
           this.fetchSession(roomName, callbackFunction);

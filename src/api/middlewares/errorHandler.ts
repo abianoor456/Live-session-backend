@@ -7,10 +7,11 @@ function errorMiddleware(error: HttpException, request: Request, response: Respo
   const message = error.message || 'Something went wrong';
   response
     .status(status)
-    .send({
+    .json({
       status,
       message,
-    })
+    });
+    return;
 }
  
 export default errorMiddleware;
