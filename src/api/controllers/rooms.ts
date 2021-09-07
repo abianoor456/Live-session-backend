@@ -1,12 +1,19 @@
 import { Request, Response, NextFunction } from "express";
-import { Session } from "opentok";
-import opentok from "../services/tokbox/tokbox";
-import { KeyValue } from "../lib/keyValue";
 import HttpException from "../lib/exception";
 import { HttpStatusCode } from "../util/statusCodes";
-const apiKey = process.env.TOKBOX_API_KEY
+import OpenTokHandler from "../services/tokbox/tokbox";
+import { red } from "colors";
+const apiKey = process.env.TOKBOX_API_KEY;
+const apiSecret = process.env.TOKBOX_API_SECRET;
+let opentok: OpenTokHandler;
 
-var roomToSessionIdDictionary: KeyValue = {};
+if(!(apiKey && apiSecret)){
+    new HttpException(HttpStatusCode.BAD_REQUEST, "API Key and API Secret not specified!");
+}
+else{
+    console.log(red.inverse("OpenTok Initialized!"));
+    opentok = new OpenTokHandler(apiKey!, apiSecret!);
+}
 
 exports.test = (req: Request, res: Response) => {
     res.status(200).json({data: `TEST SUCCESSFULL!`});
@@ -14,48 +21,23 @@ exports.test = (req: Request, res: Response) => {
 
 exports.getSession = async (req: Request, res: Response, next: NextFunction) => {
     try {
+        
         const roomName: string = req.params.name;
-        console.log('attempting to create a session associated with the room: ' + roomName);
 
-        // if the room name is associated with a session ID, fetch that
-        if (roomToSessionIdDictionary[roomName]) {
-            const sessionId: string = roomToSessionIdDictionary[roomName];
-            console.log(sessionId);
-
-            // generate token
-            const token: string = opentok.generateToken(sessionId);
-            
-            res.status(200).json({
+        await opentok.getSession({
+            roomName: roomName,
+            errorFunction: (error) => {
+                next(new HttpException(HttpStatusCode.INTERNAL_SERVER, error.message));
+            },
+            callbackFunction: (apiKey, sessionId, token, roomPassword) => {
+                res.status(200).json({
                 apiKey,
                 sessionId,
                 token,
-                name: roomName,
-            });
-        }
-        // if this is the first time the room is being accessed, create a new session ID
-        else {
-            opentok.createSession({ mediaMode: 'routed' }, function (err: any, session: Session) {
-                if (err) {
-                    console.log(err);
-                    res.status(500).send({ error: 'createSession error:' + err });
-                    return;
-                }
-
-                roomToSessionIdDictionary[roomName] = session.sessionId;
-
-                console.log(roomToSessionIdDictionary);
-
-                // generate token
-                const token: string = opentok.generateToken(session.sessionId);
-
-                res.status(200).json({
-                    apiKey: apiKey,
-                    sessionId: session.sessionId,
-                    token: token,
-                    name: roomName
+                password: roomPassword,
                 });
-            });
-        }
+            },
+        });
     } catch (error) {
         console.log(error);
         next(new HttpException(HttpStatusCode.INTERNAL_SERVER, "Something went wrong in the API Controller!"));
