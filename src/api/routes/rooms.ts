@@ -6,7 +6,10 @@ const router = Router();
 
 //All API routes for Room Entity
 
-//Create/ Join a Room
-router.get(`/:name`, roomController.getSession);
+//Create a Room
+router.post(`/:name`, roomController.createSession);
+
+//Join a Room
+router.get(`/:password`, roomController.getSession);
 
 module.exports = router;

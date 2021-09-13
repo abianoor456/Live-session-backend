@@ -5,6 +5,7 @@ const morgan = require(`morgan`);
 const cors = require(`cors`);
 
 import serviceSetup from './api/middlewares/serviceStarter';
+import errorMiddleware from './api/middlewares/errorHandler';
 
 dotenv.config();
 
@@ -21,6 +22,9 @@ app.use(serviceSetup);
 //Setting up routes here
 const room = require(`./api/routes/rooms`);
 app.use(`/api/v1/room`, room);
+
+//Setting up Error Handler
+app.use(errorMiddleware);
 
 //Service start on PORT
 const server = app.listen(process.env.PORT, () => {

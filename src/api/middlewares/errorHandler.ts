@@ -11,7 +11,6 @@ function errorMiddleware(error: HttpException, request: Request, response: Respo
       status,
       message,
     });
-    return;
 }
  
 export default errorMiddleware;
