@@ -23,6 +23,9 @@ app.use(serviceSetup);
 const room = require(`./api/routes/rooms`);
 app.use(`/api/v1/room`, room);
 
+const ping = require(`./api/routes/ping`);
+app.use(`/ping`,);
+
 //Setting up Error Handler
 app.use(errorMiddleware);
 

@@ -34,14 +34,12 @@ function serviceSetup(req: Request, res: Response, next: NextFunction) {
             return;
         }
         else{
-            console.log("test1");
             next(new HttpException(HttpStatusCode.BAD_REQUEST, "API Key and API Secret not specified!"));
             return;
         }
         break;
       }
       default:{
-        console.log("test2");
         next(new HttpException(HttpStatusCode.BAD_REQUEST, "Service header not specified in request!"));
         return;
       }
