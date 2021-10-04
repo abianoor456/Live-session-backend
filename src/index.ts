@@ -17,14 +17,16 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 app.use(morgan(`dev`));
+const ping = require(`./api/routes/ping`);
+app.use(`/ping`, ping);
+
+
 app.use(serviceSetup);
 
 //Setting up routes here
 const room = require(`./api/routes/rooms`);
 app.use(`/api/v1/room`, room);
 
-const ping = require(`./api/routes/ping`);
-app.use(`/ping`, ping);
 
 //Setting up Error Handler
 app.use(errorMiddleware);

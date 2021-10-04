@@ -1,4 +1,5 @@
 import "express"; // Modifies global namespace, so include it!
+import { TwilioService } from "./api/services/twilio/twilio";
 
 declare global {
     namespace Express {
@@ -10,7 +11,7 @@ declare global {
 
     var services: {
         tokbox: any;
-        twilio: any;
+        twilio: TwilioService | null;
     };
 }
 
