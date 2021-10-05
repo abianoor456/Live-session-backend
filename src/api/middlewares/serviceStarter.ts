@@ -4,7 +4,8 @@ import OpenTokHandler from '../services/tokbox/tokbox';
 import HttpException from '../lib/exception';
 import { HttpStatusCode } from '../util/statusCodes';
 import { blue, red, yellow } from 'colors';
-import { TwilioService } from '../services/twilio/twilio';
+import { TwilioHandler } from '../services/twilio/twilio';
+import { Handler } from '../services/handler';
 require('dotenv').config();
 
 const apiKey = process.env.TOKBOX_API_KEY;
@@ -32,8 +33,9 @@ function twilioKeys(){
 }
  
 function serviceSetup(req: Request, res: Response, next: NextFunction) {
-    
+    const handler= new Handler();
   switch(req.headers.service){
+
       case 'tokbox':{
        
         if(checkKeys()){
@@ -42,6 +44,7 @@ function serviceSetup(req: Request, res: Response, next: NextFunction) {
                 global.services.tokbox.logRooms();
             }
             else{
+                
                 global.services.tokbox = new OpenTokHandler(apiKey!, apiSecret!);
                 console.log(red.inverse("Opentok Initialized!"));
             }
@@ -62,14 +65,12 @@ function serviceSetup(req: Request, res: Response, next: NextFunction) {
                 global.services.twilio.logRooms();
             }
             else{
-                global.services.twilio = new TwilioService(twilioAccountId, authToken);;
+                global.services.twilio = new TwilioHandler(twilioAccountId, authToken);;
                 console.log(red.inverse("Twilio Initialized!"));
             }
             next();
             return;
         }
-
-
       }
 
 

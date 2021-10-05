@@ -1,11 +1,11 @@
-import { room } from "../../lib/keyValue";
+import { Room } from "../../lib/keyValue";
 
 
 
 const AccessToken = require('twilio').jwt.AccessToken;
 const VideoGrant = AccessToken.VideoGrant;
 
-export function tokenGenerator(identity: any, room: room):{token: string, identity: string} {
+export function tokenGenerator(identity: any, room: string):{token: string, identity: string} {
     // Create an access token which we will sign and return to the client,
     // containing the grant we just created
     const token = new AccessToken(
@@ -19,7 +19,7 @@ export function tokenGenerator(identity: any, room: room):{token: string, identi
   
     // Grant the access token Twilio Video capabilities
     const grant = new VideoGrant({
-      room: room.uniqueName // the specific room's name
+      room: room // the specific room's name
     });
     token.addGrant(grant);
   

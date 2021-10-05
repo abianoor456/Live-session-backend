@@ -1,89 +1,61 @@
 
-import { room, TwilioRoom } from "../../lib/keyValue";
+import {  Room, RoomData } from "../../lib/keyValue";
 import { tokenGenerator } from "./tokenGenerator";
 import cryptoRandomString from 'crypto-random-string';
+import { Handler } from "../handler";
+import { sessionOptions } from "../tokbox/types";
+;
+import { blue, green } from "colors";
 
 const color = require('colors')
 
-export class TwilioService {
+export class TwilioHandler extends Handler {
 
-    private rooms: TwilioRoom = {}
+    //private rooms: RoomData = {}
 
     constructor(private accountSid: string | undefined, private authToken: string | undefined) {
+        
+        super();
+        console.log('Twilio initialised')
         this.accountSid = accountSid;
         this.authToken = authToken;
         this.addDummy();
         this.logRooms();
-
         
     }
 
     addDummy(){
-        const room: room={
-            sid: 'RM3501a77604f61e5ae76b316c802c5e2c',
-            status: 'in-progress',
-            accountSid: 'ACb29af0746a3fe28c38e04b42e467da6b',
-            uniqueName: 'room19',
-            maxParticipants: 50,
-            password: '6ed0b7'
+        const room: Room={
+            id: 'RM3501a77604f61e5ae76b316c802c5e2c',
+            password: '6ed0b7',
+            type:"Twilio"
           }
-          this.addRoom(room, room.uniqueName);
+          this.addRoom( 'room19',room);
     }
 
-    logRooms(){
-        console.log(this.rooms);
-    }
-
-    addRoom(room: room, name: string) {
-        if (!this.rooms[name]) {
-            this.rooms[name] = room;
-        }
-        else {
-            console.log(`The room with name ${name} already exists`);
-        }
-    }
     
-    generatePassword(name: string) {
-        return cryptoRandomString(6);
-      }
 
-    getRoom(name: string) {
-        if (this.rooms[name]) {
-            return this.rooms[name];
+    getRoom(password: string) :  { Room: Room; AccessToken: string | undefined; } {
+        console.log('in find room')
+        let room: Room = {
+            id: '',
+            password:'',
+            type:''
         }
-        else{
-            console.log(`This room does not exist`)
-        }
-    }
+        let roomName='';
 
-     findRoom(password: string) :  { Room: room; AccessToken: string | undefined; } {
-        let room: room = {
-            sid: '',
-            status: '',
-            accountSid: '',
-            uniqueName: '',
-            maxParticipants: 0,
-            password:''
-        }
-        Object.keys(this.rooms).map(key => {
-          let temp = this.rooms[key];
-          if(temp.password == password){
-            room= temp;
-          }
-        });
-        const accessToken: string| undefined= this.getToken(room.uniqueName)?.token
+        [room, roomName]= this.findRoom(password)
+
+        const accessToken: string| undefined= this.getToken(roomName)?.token
         return {Room: room, AccessToken: accessToken };
       }
 
-    async createRoom(name: string): Promise<room> {
+     async createRoom(name: string): Promise<Room> {
         const client = require('twilio')(this.accountSid, this.authToken);
-        let Room: room = {
-            sid: '',
-            status: '',
-            accountSid: '',
-            uniqueName: '',
-            maxParticipants: 0,
-            password:''
+        let Room: Room = {
+            id: '',
+            password:'',
+            type: ''
         }
         try {
             const room = await client.video.rooms.create({
@@ -94,15 +66,11 @@ export class TwilioService {
             })
             const password= this.generatePassword(name);
             Room = {
-                sid: room.sid,
-                status: room.status,
-                dateCreated: room.dateCreated,
-                accountSid: room.accountSid,
-                uniqueName: room.uniqueName,
-                maxParticipants: room.maxParticipants,
-                password: password
+                id: room.sid,
+                password: password,
+                type:'twilio'
             }
-            this.addRoom(Room, name);
+            this.addRoom( name,Room);
             this.logRooms();
 
         } catch (error) {
@@ -111,10 +79,16 @@ export class TwilioService {
         return Room;
     }
 
+    async createRoom2(options: sessionOptions){
+        const { roomName, callbackFunction, errorFunction } = options;
+      console.log(green("Creating a new Room!"));
+
+    }
+
     getToken(name: string): {token: string, identity: string} | undefined{
-        const room= this.getRoom(name);
+        const room= this.findRoombyName(name);
         if(room){
-            const token= tokenGenerator('abia',room);
+            const token= tokenGenerator('abia',name);
             return token;
         }
         else{

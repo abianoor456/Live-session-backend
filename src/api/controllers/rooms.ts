@@ -41,7 +41,7 @@ exports.getSession = async (req: Request, res: Response, next: NextFunction) => 
             //const roomName: string = req.params.name;
             if (global.services.twilio) {
                 console.log(`finding room of password: ${password}`)
-                const room = global.services.twilio.findRoom(password); /*fix---*/ //here roomname is password lol 
+                const room = global.services.twilio.findRoom1(password);  
                 res.status(200).json({
                     msg: `Room Retrieved`,
                     Room: room.Room,
