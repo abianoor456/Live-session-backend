@@ -41,7 +41,7 @@ function serviceSetup(req: Request, res: Response, next: NextFunction) {
         if(checkKeys()){
             if(global.services.tokbox){
                 console.log(blue.inverse("Opentok Continued!"));
-                global.services.tokbox.logRooms();
+               // global.services.tokbox.logRooms();
             }
             else{
                 
@@ -62,7 +62,7 @@ function serviceSetup(req: Request, res: Response, next: NextFunction) {
         if(twilioKeys()){
             if(global.services.twilio){
                 console.log(blue.inverse("Twilio Continued!"));
-                global.services.twilio.logRooms();
+                //global.services.twilio.logRooms();
             }
             else{
                 global.services.twilio = new TwilioHandler(twilioAccountId, authToken);;

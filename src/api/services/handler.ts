@@ -26,7 +26,6 @@ export class Handler{
       Object.keys(this.rooms).forEach(key => {
         temp = this.rooms[key];
         if(temp.password == password){
-         // return temp;
           roomName= key;
           return [temp,roomName];
         }
@@ -43,9 +42,16 @@ export class Handler{
       }
     }
 
-    // abstract createR(){
+    protected roomExists(name: string, type: string): boolean{
+      if(this.rooms[name]){
+        if(this.rooms[name].type==type){
+          return true;
+        }
+        return false;
+      }
+      return false;
 
-    // }
+    }
     
 
 }

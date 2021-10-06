@@ -5,6 +5,7 @@ export type otCallbackFunction = (
   password: string
 ) => void;
 
+
 export type otErrorFunction = (error: Error) => void;
 
 export interface sessionOptions {

@@ -16,10 +16,10 @@ class OpenTokHandler extends Handler {
       this.opentok = new OpenTok(apiKey, apiSecret);
     }
 
-    private async createRoom(options: sessionOptions) {
+     async createRoom(options: sessionOptions) {
       const { roomName, callbackFunction, errorFunction } = options;
       console.log(green("Creating a new Room!"));
-      if(this.rooms[roomName]){
+      if(this.roomExists(roomName,'tokbox')){
         errorFunction(new HttpException(400,"Room name already in use!"));
         return;
       } else {
@@ -42,7 +42,7 @@ class OpenTokHandler extends Handler {
       }
     }
 
-    private getRoom(options: sessionOptions) {
+     getRoom(options: sessionOptions) {
       const { roomName , callbackFunction, errorFunction } = options;
       console.log(blue("Fetching an existing room!"));
       const [room, roomname] = this.findRoom(roomName);

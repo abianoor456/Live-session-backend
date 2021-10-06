@@ -14,6 +14,8 @@ exports.getSession = async (req: Request, res: Response, next: NextFunction) => 
 
             try {
 
+               if(global.services.tokbox){
+
                 global.services.tokbox.getRoom({
                     roomName: password,
                     errorFunction: (error: Error) => {
@@ -30,6 +32,7 @@ exports.getSession = async (req: Request, res: Response, next: NextFunction) => 
                         return;
                     },
                 });
+            }
             } catch (error) {
                 console.log(error);
                 next(new HttpException(HttpStatusCode.INTERNAL_SERVER, "Something went wrong in the API Controller!"));
@@ -41,12 +44,24 @@ exports.getSession = async (req: Request, res: Response, next: NextFunction) => 
             //const roomName: string = req.params.name;
             if (global.services.twilio) {
                 console.log(`finding room of password: ${password}`)
-                const room = global.services.twilio.findRoom1(password);  
-                res.status(200).json({
-                    msg: `Room Retrieved`,
-                    Room: room.Room,
-                    Token: room.AccessToken
-                });
+                 global.services.twilio.getRoom({
+                    roomName: password,errorFunction: (error: Error) => {
+                        next(new HttpException(HttpStatusCode.INTERNAL_SERVER, error.message));
+                        return;
+                    },
+                    callbackFunction: (apiKey: string, sessionId: string, token: string, roomPassword: string) => {
+                        res.status(200).json({
+                            apiKey,
+                            sessionId,
+                            token,
+                            password: roomPassword,
+                        });
+                        return;
+                    }
+
+                });  
+
+                
             }
 
         }
@@ -59,6 +74,7 @@ exports.createSession = async (req: Request, res: Response, next: NextFunction) 
     switch (req.headers.service) {
         case 'tokbox': {
             try {
+                if(global.services.tokbox){
                 await global.services.tokbox.createRoom({
                     roomName: roomName,
                     errorFunction: (error: Error) => {
@@ -75,6 +91,7 @@ exports.createSession = async (req: Request, res: Response, next: NextFunction) 
                         return;
                     },
                 });
+            }
             } catch (error) {
                 console.log(error);
                 next(new HttpException(HttpStatusCode.INTERNAL_SERVER, "Something went wrong in the API Controller!"));
@@ -84,11 +101,23 @@ exports.createSession = async (req: Request, res: Response, next: NextFunction) 
             //const roomName: string = req.params.name;
             //console.log(color.green.inverse(`Creating room by name: ${roomName}`));
             if (global.services.twilio) {
-                const room = await global.services.twilio.createRoom(roomName);
-                res.status(200).json({
-                    msg: `Room Created`,
-                    Room: room
+                await global.services.twilio.createRoom({
+                    roomName: roomName,
+                    errorFunction: (error: Error) => {
+                        next(new HttpException(HttpStatusCode.INTERNAL_SERVER, error.message));
+                        return;
+                    },
+                    callbackFunction: (apiKey: string, sessionId: string, token: string, roomPassword: string) => {
+                        res.status(200).json({
+                            apiKey,
+                            sessionId,
+                            token,
+                            password: roomPassword,
+                        });
+                        return;
+                    },
                 });
+                
             }
 
         }
