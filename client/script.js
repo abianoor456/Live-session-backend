@@ -3,7 +3,7 @@ var app = new Vue({
     el: '#app',
     data: {
 
-        url: 'http://localhost:4000/api/v1/room/',
+        url: '/api/v1/room/',
         password: '',
         name:''
     },
