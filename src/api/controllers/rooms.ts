@@ -52,12 +52,13 @@ exports.getSession = async (req: Request, res: Response, next: NextFunction) => 
                         next(new HttpException(HttpStatusCode.INTERNAL_SERVER, error.message));
                         return;
                     },
-                    callbackFunction: (apiKey: string, sessionId: string, token: string, roomPassword: string) => {
+                    callbackFunction: (apiKey: string, sessionId: string, token: string, roomPassword: string,identity: string) => {
                         res.status(200).json({
                             apiKey,
                             sessionId,
                             token,
                             password: roomPassword,
+                            identity
                         });
                         return;
                     }
