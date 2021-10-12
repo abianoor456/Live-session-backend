@@ -7,6 +7,7 @@ import { sessionOptions } from "../tokbox/types";
 ;
 import { blue, green } from "colors";
 import HttpException from "../../lib/exception";
+import { twilioSessionOptions } from "./types";
 
 const color = require('colors')
 
@@ -32,17 +33,17 @@ export class TwilioHandler extends Handler {
         this.addRoom('room19', room);
     }
 
-    getRoom(options: sessionOptions) {
-        const { roomName, callbackFunction, errorFunction } = options;
+    getRoom(options: twilioSessionOptions) {
+        const { roomName,userName, callbackFunction, errorFunction } = options;
         console.log(blue("Fetching an existing room!"));
 
         const [room, roomname] = this.findRoom(roomName);
 
         if (room.id !== "") {
 
-            const token = this.getToken(roomname, 'abia');
+            const token = this.getToken(roomname, userName);
             if (token?.token) {
-                callbackFunction('', room.id, token?.token, room.password);
+                callbackFunction('', room.id, token?.token, room.password,token.identity);
                 return;
             }
             else {
@@ -100,7 +101,7 @@ export class TwilioHandler extends Handler {
         }
     }
 
-    getToken(roomName: string, userName: string): { token: string, identity: string } | undefined {
+    getToken(roomName: string, userName: string | string[]): { token: string, identity: string } | undefined {
         const room = this.findRoombyName(roomName);
         if (room) {
             const token = tokenGenerator(userName, roomName);

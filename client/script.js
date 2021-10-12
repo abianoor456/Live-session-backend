@@ -5,7 +5,8 @@ var app = new Vue({
 
         url: '/api/v1/room/',
         password: '',
-        name:''
+        name:'',
+        userName:''
     },
     methods: {
 
@@ -18,8 +19,10 @@ var app = new Vue({
                     method: 'get',
                     headers: new Headers({
                         'Service': 'twilio',
+                        'username': this.userName,
                         'Content-Type': 'application/json'
                     }),
+                   // body: JSON.stringify({ userName: this.userName })
                 });
                 response = await response.json();
                 console.log(response);
@@ -39,6 +42,7 @@ var app = new Vue({
                         'Service': 'twilio',
                         'Content-Type': 'application/json'
                     }),
+                    
                 });
                 response = await response.json();
                 console.log(response);

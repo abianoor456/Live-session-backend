@@ -43,9 +43,12 @@ exports.getSession = async (req: Request, res: Response, next: NextFunction) => 
         case 'twilio': {
             //const roomName: string = req.params.name;
             if (global.services.twilio) {
+                console.log('User:',req.headers.username);
                 console.log(`finding room of password: ${password}`)
+                if (req.headers.username){
+                console.log(`userName: ${req.headers.username}`);
                  global.services.twilio.getRoom({
-                    roomName: password,errorFunction: (error: Error) => {
+                    roomName: password,userName:req.headers.username, errorFunction: (error: Error) => {
                         next(new HttpException(HttpStatusCode.INTERNAL_SERVER, error.message));
                         return;
                     },
@@ -61,7 +64,10 @@ exports.getSession = async (req: Request, res: Response, next: NextFunction) => 
 
                 });  
 
-                
+            }
+            else{
+                throw new HttpException(400, 'Username not sepcified in header');
+            }
             }
 
         }
@@ -123,3 +129,5 @@ exports.createSession = async (req: Request, res: Response, next: NextFunction) 
         }
     }
 }
+
+

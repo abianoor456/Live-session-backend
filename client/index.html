@@ -13,13 +13,17 @@
 
     <div id="app">
         <form>
+            <label>Password: </label>
             <input v-model="password" type="text" >
+            <label>Username: </label>
+            <input v-model="userName" type="text" >
             <button type="submit" @click.prevent="getRoom()" >Submit</button>
         </form>
 
         <h1>Create Room:</h1>
 
         <form>
+            <label>Room Name: </label>
             <input v-model="name" type="text" >
             <button type="submit" @click.prevent="createRoom()" >Submit</button>
         </form>
