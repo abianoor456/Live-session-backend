@@ -6,42 +6,20 @@ import cryptoRandomString from 'crypto-random-string';
 import { blue, green } from "colors";
 import { Roles } from "./roles";
 import HttpException from "../../lib/exception";
+import { Handler } from "../handler";
 
-class OpenTokHandler {
+class OpenTokHandler extends Handler {
     private opentok: OpenTok;
-    private rooms: RoomData = {};
 
     constructor(private apiKey: string, private apiSecret: string) {
+      super();
       this.opentok = new OpenTok(apiKey, apiSecret);
     }
 
-    private logRooms(){
-      console.log(this.rooms);
-    }
-
-    private generatePassword(name: string) {
-      return cryptoRandomString(6);
-    }
-
-    private findRoom(password: string) : Room {
-      let temp: Room = {id:"", password:""};
-      Object.keys(this.rooms).forEach(key => {
-        temp = this.rooms[key];
-        if(temp.password == password){
-          return temp;
-        }
-      });
-      return temp;
-    }
-
-    private addRoom(name: string, room: Room){
-      this.rooms[name] = {id: room.id, password: room.password};
-    }
-
-    private async createRoom(options: sessionOptions) {
+     async createRoom(options: sessionOptions) {
       const { roomName, callbackFunction, errorFunction } = options;
       console.log(green("Creating a new Room!"));
-      if(this.rooms[roomName]){
+      if(this.roomExists(roomName,'tokbox')){
         errorFunction(new HttpException(400,"Room name already in use!"));
         return;
       } else {
@@ -50,9 +28,9 @@ class OpenTokHandler {
             errorFunction(error);
             return;
           }
-    
+
           if (session) {
-            const room: Room = {id : session.sessionId, password : this.generatePassword(roomName)};
+            const room: Room = {id : session.sessionId, password : this.generatePassword(roomName),type:"tokbox"};
             this.addRoom(roomName, room);
             this.logRooms();
             const tokenOptions: TokenOptions = { role: Roles.admin, data: "name=admin"};
@@ -64,11 +42,11 @@ class OpenTokHandler {
       }
     }
 
-    private getRoom(options: sessionOptions) {
+     getRoom(options: sessionOptions) {
       const { roomName , callbackFunction, errorFunction } = options;
       console.log(blue("Fetching an existing room!"));
-      const room = this.findRoom(roomName);
-      
+      const [room, roomname] = this.findRoom(roomName);
+
       if(room.id !== ""){
         const tokenOptions: TokenOptions = { role: Roles.user, data: "name=publisher"};
         const token: string = this.opentok.generateToken(room.id, tokenOptions);

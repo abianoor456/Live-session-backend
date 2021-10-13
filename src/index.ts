@@ -6,6 +6,7 @@ const cors = require(`cors`);
 
 import serviceSetup from './api/middlewares/serviceStarter';
 import errorMiddleware from './api/middlewares/errorHandler';
+import { join } from 'path/posix';
 
 dotenv.config();
 
@@ -17,6 +18,12 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 app.use(morgan(`dev`));
+
+app.use(express.static('client'))
+
+const index = require(`./api/routes/index`);
+app.use(`/`, index);
+
 const ping = require(`./api/routes/ping`);
 app.use(`/ping`, ping);
 

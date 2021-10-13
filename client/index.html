@@ -4,9 +4,32 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <title>Twilio Client</title>
 </head>
 <body>
+
+    <h1>Get Room:</h1>
+
+    <div id="app">
+        <form>
+            <label>Password: </label>
+            <input v-model="password" type="text" >
+            <label>Username: </label>
+            <input v-model="userName" type="text" >
+            <button type="submit" @click.prevent="getRoom()" >Submit</button>
+        </form>
+
+        <h1>Create Room:</h1>
+
+        <form>
+            <label>Room Name: </label>
+            <input v-model="name" type="text" >
+            <button type="submit" @click.prevent="createRoom()" >Submit</button>
+        </form>
+
+    </div>
+    <script src="script.js"></script>
     
 </body>
 </html>
